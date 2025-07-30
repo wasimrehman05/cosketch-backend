@@ -3,10 +3,11 @@ const router = express.Router();
 const UserController = require("../controllers/UserController");
 const { authenticateToken } = require("../middleware/auth");
 const { validateRegistration, validateLogin } = require("../middleware/validateRequest");
+const { authLimiter } = require("../middleware/rateLimiter");
 
-// Public routes
-router.post("/register", validateRegistration, UserController.registerUser);
-router.post("/login", validateLogin, UserController.loginUser);
+// Public routes with enhanced security
+router.post("/register", authLimiter, validateRegistration, UserController.registerUser);
+router.post("/login", authLimiter, validateLogin, UserController.loginUser);
 
 // Protected routes
 router.get("/profile", authenticateToken, UserController.getUserProfile);

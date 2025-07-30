@@ -1,37 +1,143 @@
+const { body, param, validationResult } = require('express-validator');
 const { ValidationException } = require("../exceptions");
-const { validateUserInput } = require("../utils/validators");
+const { VALIDATION_MESSAGES, PASSWORD_MIN_LENGTH } = require("../constants");
 
-const validateRegistration = (req, res, next) => {
-    try {
-        const { name, email, password } = req.body || {};
-        const errors = validateUserInput({ name, email, password });
-        
-        if (Object.keys(errors).length > 0) {
-            throw new ValidationException("Validation failed", errors);
-        }
-        
-        next();
-    } catch (error) {
-        next(error);
+const handleValidationErrors = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        const formattedErrors = {};
+        errors.array().forEach(error => {
+            formattedErrors[error.path] = error.msg;
+        });
+        throw new ValidationException("Validation failed", formattedErrors);
     }
+    next();
 };
 
-const validateLogin = (req, res, next) => {
-    try {
-        const { email, password } = req.body || {};
-        const errors = validateUserInput({ email, password }, true);
-        
-        if (Object.keys(errors).length > 0) {
-            throw new ValidationException("Validation failed", errors);
-        }
-        
-        next();
-    } catch (error) {
-        next(error);
-    }
-};
+const validateRegistration = [
+    body('name')
+        .notEmpty()
+        .withMessage(VALIDATION_MESSAGES.USER.NAME_REQUIRED)
+        .trim()
+        .escape()
+        .isLength({ min: 2, max: 50 })
+        .withMessage(VALIDATION_MESSAGES.USER.NAME_TOO_SHORT),
+    body('email')
+        .notEmpty()
+        .withMessage(VALIDATION_MESSAGES.USER.EMAIL_REQUIRED)
+        .trim()
+        .isEmail()
+        .normalizeEmail()
+        .withMessage(VALIDATION_MESSAGES.USER.EMAIL_INVALID_FORMAT),
+    body('password')
+        .notEmpty()
+        .withMessage(VALIDATION_MESSAGES.USER.PASSWORD_REQUIRED)
+        .trim()
+        .isLength({ min: PASSWORD_MIN_LENGTH })
+        .withMessage(VALIDATION_MESSAGES.USER.PASSWORD_TOO_SHORT),
+    handleValidationErrors
+];
+
+const validateLogin = [
+    body('email')
+        .notEmpty()
+        .withMessage(VALIDATION_MESSAGES.USER.EMAIL_REQUIRED)
+        .trim()
+        .isEmail()
+        .normalizeEmail()
+        .withMessage(VALIDATION_MESSAGES.USER.EMAIL_INVALID_FORMAT),
+    body('password')
+        .notEmpty()
+        .withMessage(VALIDATION_MESSAGES.USER.PASSWORD_REQUIRED)
+        .trim(),
+    handleValidationErrors
+];
+
+const validateCreateCanvas = [
+    body('name')
+        .optional()
+        .trim()
+        .escape()
+        .isLength({ min: 1, max: 100 })
+        .withMessage(VALIDATION_MESSAGES.CANVAS.NAME_TOO_LONG),
+    body('description')
+        .optional()
+        .trim()
+        .escape()
+        .isLength({ min: 0, max: 500 })
+        .withMessage(VALIDATION_MESSAGES.CANVAS.DESCRIPTION_TOO_LONG),
+    body('elements')
+        .optional()
+        .isArray()
+        .withMessage(VALIDATION_MESSAGES.CANVAS.ELEMENTS_INVALID_FORMAT),
+    body('isPublic')
+        .optional()
+        .isBoolean()
+        .withMessage(VALIDATION_MESSAGES.CANVAS.IS_PUBLIC_INVALID),
+    body('settings')
+        .optional()
+        .isObject()
+        .withMessage(VALIDATION_MESSAGES.CANVAS.SETTINGS_INVALID_FORMAT),
+    handleValidationErrors
+];
+
+const validateUpdateCanvas = [
+    body('name')
+        .optional()
+        .trim()
+        .escape()
+        .isLength({ min: 1, max: 100 })
+        .withMessage(VALIDATION_MESSAGES.CANVAS.NAME_TOO_LONG),
+    body('description')
+        .optional()
+        .trim()
+        .escape()
+        .isLength({ min: 0, max: 500 })
+        .withMessage(VALIDATION_MESSAGES.CANVAS.DESCRIPTION_TOO_LONG),
+    body('elements')
+        .optional()
+        .isArray()
+        .withMessage(VALIDATION_MESSAGES.CANVAS.ELEMENTS_INVALID_FORMAT),
+    body('isPublic')
+        .optional()
+        .isBoolean()
+        .withMessage(VALIDATION_MESSAGES.CANVAS.IS_PUBLIC_INVALID),
+    body('settings')
+        .optional()
+        .isObject()
+        .withMessage(VALIDATION_MESSAGES.CANVAS.SETTINGS_INVALID_FORMAT),
+    handleValidationErrors
+];
+
+const validateShareCanvas = [
+    body('email')
+        .notEmpty()
+        .withMessage(VALIDATION_MESSAGES.SHARING.EMAIL_REQUIRED)
+        .trim()
+        .isEmail()
+        .normalizeEmail()
+        .withMessage(VALIDATION_MESSAGES.SHARING.EMAIL_INVALID_FORMAT),
+    body('canEdit')
+        .optional()
+        .isBoolean()
+        .withMessage(VALIDATION_MESSAGES.SHARING.CAN_EDIT_INVALID),
+    handleValidationErrors
+];
+
+const validateCanvasId = [
+    param('canvasId')
+        .notEmpty()
+        .withMessage(VALIDATION_MESSAGES.CANVAS.CANVAS_ID_REQUIRED)
+        .isMongoId()
+        .withMessage(VALIDATION_MESSAGES.CANVAS.CANVAS_ID_INVALID_FORMAT),
+    handleValidationErrors
+];
 
 module.exports = {
     validateRegistration,
-    validateLogin
+    validateLogin,
+    validateCreateCanvas,
+    validateUpdateCanvas,
+    validateShareCanvas,
+    validateCanvasId
 }; 
