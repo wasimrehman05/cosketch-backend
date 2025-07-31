@@ -14,6 +14,14 @@ const { generalLimiter } = require("./src/middleware/rateLimiter");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// CORS configuration
+const corsOptions = {
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  optionsSuccessStatus: 200
+};
 
 if (process.env.NODE_ENV === "production") {
     app.use(helmet({
@@ -33,7 +41,7 @@ if (process.env.NODE_ENV === "production") {
 
 app.use(generalLimiter);
 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json({ limit: REQUEST_SIZE_LIMIT }));
 app.use(express.urlencoded({ extended: true, limit: REQUEST_SIZE_LIMIT }));
 
@@ -58,6 +66,7 @@ const startServer = async () => {
         app.listen(PORT, () => {
             console.log(`Server is running on port ${PORT}`);
             console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+            console.log(`CORS enabled for: ${corsOptions.origin.join(', ')}`);
         });
     } catch (error) {
         console.error('Failed to start server:', error);

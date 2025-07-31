@@ -59,7 +59,7 @@ const CanvasSchema = new mongoose.Schema({
             default: 20
         }
     }
-}, { 
+}, {
     timestamps: true,
     collection: "canvases"
 });
@@ -76,10 +76,11 @@ CanvasSchema.statics.findAllByUserId = async function (userId) {
             { owner: userId },
             { "shared_with.user": userId }
         ]
-    }).populate('owner', 'name email')
-      .populate('shared_with.user', 'name email')
-      .sort({ updatedAt: -1 });
-    
+    }).select('-elements -settings -__v')
+        .populate('owner', 'name email')
+        .populate('shared_with.user', 'name email')
+        .sort({ updatedAt: -1 });
+
     return canvases;
 };
 
@@ -89,13 +90,13 @@ CanvasSchema.statics.findPublicCanvases = async function (limit = 20, skip = 0) 
         .sort({ updatedAt: -1 })
         .limit(limit)
         .skip(skip);
-    
+
     return canvases;
 };
 
 CanvasSchema.statics.findByCanvasId = async function (canvasId, userId = null) {
     const query = { _id: canvasId };
-    
+
     // If user is not provided, only return public canvases
     if (!userId) {
         query.isPublic = true;
@@ -107,53 +108,53 @@ CanvasSchema.statics.findByCanvasId = async function (canvasId, userId = null) {
             { isPublic: true }
         ];
     }
-    
+
     const canvas = await this.findOne(query)
         .populate('owner', 'name email')
         .populate('shared_with.user', 'name email');
-    
+
     return canvas;
 };
 
 // Instance methods
 CanvasSchema.methods.canUserEdit = function (userId) {
     if (!userId) return false;
-    
+
     // Owner can always edit
     if (this.owner.toString() === userId.toString()) {
         return true;
     }
-    
+
     // Check if user is shared with edit access
     const sharedUser = this.shared_with.find(
         share => share.user.toString() === userId.toString() && share.canEdit
     );
-    
+
     return !!sharedUser;
 };
 
 CanvasSchema.methods.canUserView = function (userId) {
     // Public canvases can be viewed by anyone
     if (this.isPublic) return true;
-    
+
     if (!userId) return false;
-    
+
     // Owner can always view
     if (this.owner.toString() === userId.toString()) {
         return true;
     }
-    
+
     // Check if user is shared (with or without edit access)
     const sharedUser = this.shared_with.find(
         share => share.user.toString() === userId.toString()
     );
-    
+
     return !!sharedUser;
 };
 
 CanvasSchema.methods.canUserDelete = function (userId) {
     if (!userId) return false;
-    
+
     // Only owner can delete
     return this.owner.toString() === userId.toString();
 };
@@ -163,7 +164,7 @@ CanvasSchema.methods.addSharedUser = function (userId, canEdit = false) {
     const existingShare = this.shared_with.find(
         share => share.user.toString() === userId.toString()
     );
-    
+
     if (existingShare) {
         // Update existing share
         existingShare.canEdit = canEdit;
@@ -176,7 +177,7 @@ CanvasSchema.methods.addSharedUser = function (userId, canEdit = false) {
             sharedAt: new Date()
         });
     }
-    
+
     return this.save();
 };
 
@@ -184,7 +185,7 @@ CanvasSchema.methods.removeSharedUser = function (userId) {
     this.shared_with = this.shared_with.filter(
         share => share.user.toString() !== userId.toString()
     );
-    
+
     return this.save();
 };
 
