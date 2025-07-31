@@ -25,7 +25,7 @@ const getPublicCanvases = async (req, res) => {
 const getCanvasById = async (req, res) => {
     try {
         const { canvasId } = req.params;
-        const userId = req.user?.id || null;
+        const userId = req.user.id;
         const canvas = await CanvasService.getCanvasById(canvasId, userId);
         return ResponseHelper.success(res, 200, SUCCESS_MESSAGES.CANVAS.FETCHED, { canvas });
     } catch (error) {
@@ -49,6 +49,8 @@ const updateCanvas = async (req, res) => {
         const { canvasId } = req.params;
         const userId = req.user.id;
         const updateData = req.body;
+        console.log("req", req.method);
+        console.log("updateData", userId, updateData);
         const canvas = await CanvasService.updateCanvas(canvasId, userId, updateData);
         return ResponseHelper.success(res, 200, SUCCESS_MESSAGES.CANVAS.UPDATED, { canvas });
     } catch (error) {

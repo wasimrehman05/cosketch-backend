@@ -95,20 +95,8 @@ CanvasSchema.statics.findPublicCanvases = async function (limit = 20, skip = 0) 
 };
 
 CanvasSchema.statics.findByCanvasId = async function (canvasId, userId = null) {
-    const query = { _id: canvasId };
-
-    // If user is not provided, only return public canvases
-    if (!userId) {
-        query.isPublic = true;
-    } else {
-        // Return if user is owner, shared user, or canvas is public
-        query.$or = [
-            { owner: userId },
-            { "shared_with.user": userId },
-            { isPublic: true }
-        ];
-    }
-
+    const query = { _id: canvasId, $or: [{ owner: userId }, { "shared_with.user": userId }] };
+    
     const canvas = await this.findOne(query)
         .populate('owner', 'name email')
         .populate('shared_with.user', 'name email');

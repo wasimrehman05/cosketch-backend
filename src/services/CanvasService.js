@@ -14,7 +14,7 @@ const getPublicCanvases = async (page = 1, limit = 20) => {
     return canvases || [];
 };
 
-const getCanvasById = async (canvasId, userId = null) => {
+const getCanvasById = async (canvasId, userId) => {
     const canvas = await CanvasModel.findByCanvasId(canvasId, userId);
     
     if (!canvas) {
@@ -24,7 +24,7 @@ const getCanvasById = async (canvasId, userId = null) => {
     return canvas;
 };
 
-const createCanvas = async (userId, canvasData) => {
+const createCanvas = async (userId, canvasData = {}) => {
     const canvas = await CanvasModel.create({
         owner: userId,
         name: canvasData.name || "Untitled Canvas",

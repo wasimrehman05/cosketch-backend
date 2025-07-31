@@ -53,61 +53,6 @@ const validateLogin = [
     handleValidationErrors
 ];
 
-const validateCreateCanvas = [
-    body('name')
-        .optional()
-        .trim()
-        .escape()
-        .isLength({ min: 1, max: 100 })
-        .withMessage(VALIDATION_MESSAGES.CANVAS.NAME_TOO_LONG),
-    body('description')
-        .optional()
-        .trim()
-        .escape()
-        .isLength({ min: 0, max: 500 })
-        .withMessage(VALIDATION_MESSAGES.CANVAS.DESCRIPTION_TOO_LONG),
-    body('elements')
-        .optional()
-        .isArray()
-        .withMessage(VALIDATION_MESSAGES.CANVAS.ELEMENTS_INVALID_FORMAT),
-    body('isPublic')
-        .optional()
-        .isBoolean()
-        .withMessage(VALIDATION_MESSAGES.CANVAS.IS_PUBLIC_INVALID),
-    body('settings')
-        .optional()
-        .isObject()
-        .withMessage(VALIDATION_MESSAGES.CANVAS.SETTINGS_INVALID_FORMAT),
-    handleValidationErrors
-];
-
-const validateUpdateCanvas = [
-    body('name')
-        .optional()
-        .trim()
-        .escape()
-        .isLength({ min: 1, max: 100 })
-        .withMessage(VALIDATION_MESSAGES.CANVAS.NAME_TOO_LONG),
-    body('description')
-        .optional()
-        .trim()
-        .escape()
-        .isLength({ min: 0, max: 500 })
-        .withMessage(VALIDATION_MESSAGES.CANVAS.DESCRIPTION_TOO_LONG),
-    body('elements')
-        .optional()
-        .isArray()
-        .withMessage(VALIDATION_MESSAGES.CANVAS.ELEMENTS_INVALID_FORMAT),
-    body('isPublic')
-        .optional()
-        .isBoolean()
-        .withMessage(VALIDATION_MESSAGES.CANVAS.IS_PUBLIC_INVALID),
-    body('settings')
-        .optional()
-        .isObject()
-        .withMessage(VALIDATION_MESSAGES.CANVAS.SETTINGS_INVALID_FORMAT),
-    handleValidationErrors
-];
 
 const validateShareCanvas = [
     body('email')
@@ -136,8 +81,6 @@ const validateCanvasId = [
 module.exports = {
     validateRegistration,
     validateLogin,
-    validateCreateCanvas,
-    validateUpdateCanvas,
     validateShareCanvas,
     validateCanvasId
 }; 
