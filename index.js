@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 3001;
 const HOST = '0.0.0.0';
 
 const corsOptions = {
-  origin: [process.env.FRONTEND_URL],
+  origin: [process.env.FRONTEND_URL || 'http://localhost:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -29,7 +29,7 @@ const corsOptions = {
 
 const io = new Server(server, {
   cors: {
-    origin: [process.env.FRONTEND_URL],
+    origin: [process.env.FRONTEND_URL || 'http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST']
   }
@@ -38,17 +38,17 @@ const io = new Server(server, {
 const webSocketService = new WebSocketService(io);
 
 if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging") {
-    app.use(helmet({
-        contentSecurityPolicy: {
-            directives: {
-                defaultSrc: ["'self'"],
-                scriptSrc: ["'self'", process.env.FRONTEND_URL],
-                styleSrc: ["'self'", "'unsafe-inline'"],
-                imgSrc: ["'self'", "data:", "https:"],
-            }
-        },
-        hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }
-    }));
+            app.use(helmet({
+            contentSecurityPolicy: {
+                directives: {
+                    defaultSrc: ["'self'"],
+                    scriptSrc: ["'self'", process.env.FRONTEND_URL || 'http://localhost:3000'],
+                    styleSrc: ["'self'", "'unsafe-inline'"],
+                    imgSrc: ["'self'", "data:", "https:"],
+                }
+            },
+            hsts: { maxAge: 31536000, includeSubDomains: true, preload: true }
+        }));
 } else {
     app.use(helmet());
 }
