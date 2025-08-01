@@ -18,6 +18,7 @@ router.post("/", authenticateToken, CanvasController.createCanvas);
 router.put("/:canvasId", authenticateToken, validateCanvasId, CanvasController.updateCanvas);
 router.delete("/:canvasId", authenticateToken, validateCanvasId, CanvasController.deleteCanvas);
 router.post("/:canvasId/share", authenticateToken, validateCanvasId, validateShareCanvas, CanvasController.shareCanvas);
+router.put("/:canvasId/share/:targetUserId", authenticateToken, validateCanvasId, CanvasController.updateSharedPermission);
 router.delete("/:canvasId/share/:targetUserId", authenticateToken, validateCanvasId, CanvasController.unshareCanvas);
 router.get("/stats/overview", authenticateToken, CanvasController.getCanvasStats);
 

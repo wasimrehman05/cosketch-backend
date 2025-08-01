@@ -240,6 +240,7 @@ const SUCCESS_MESSAGES = {
         DELETED: 'Canvas deleted successfully',
         SHARED: 'Canvas shared successfully',
         UNSHARED: 'Canvas unshared successfully',
+        PERMISSION_UPDATED: 'Canvas permission updated successfully',
         FETCHED: 'Canvas fetched successfully',
         LIST_FETCHED: 'Canvases fetched successfully'
     },

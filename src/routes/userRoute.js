@@ -8,6 +8,7 @@ const { authLimiter } = require("../middleware/rateLimiter");
 // Public routes with enhanced security
 router.post("/register", authLimiter, validateRegistration, UserController.registerUser);
 router.post("/login", authLimiter, validateLogin, UserController.loginUser);
+router.post("/check", authLimiter, UserController.checkUserExists);
 
 // Protected routes
 router.get("/profile", authenticateToken, UserController.getUserProfile);

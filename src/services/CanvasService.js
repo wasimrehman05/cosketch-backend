@@ -120,8 +120,10 @@ const shareCanvas = async (canvasId, userId, shareData) => {
     
     await canvas.addSharedUser(userToShare._id, shareData.canEdit || false);
     
-    return canvas.populate('owner', 'name email')
-                 .populate('shared_with.user', 'name email');
+    return canvas.populate([
+        { path: 'owner', select: 'name email' },
+        { path: 'shared_with.user', select: 'name email' }
+    ]);
 };
 
 const unshareCanvas = async (canvasId, userId, targetUserId) => {
@@ -138,8 +140,30 @@ const unshareCanvas = async (canvasId, userId, targetUserId) => {
     
     await canvas.removeSharedUser(targetUserId);
     
-    return canvas.populate('owner', 'name email')
-                 .populate('shared_with.user', 'name email');
+    return canvas.populate([
+        { path: 'owner', select: 'name email' },
+        { path: 'shared_with.user', select: 'name email' }
+    ]);
+};
+
+const updateSharedPermission = async (canvasId, userId, targetUserId, canEdit) => {
+    const canvas = await CanvasModel.findById(canvasId);
+    
+    if (!canvas) {
+        throw new NotFoundException(ERROR_MESSAGES.CANVAS.NOT_FOUND);
+    }
+    
+    // Only owner can update permissions
+    if (canvas.owner.toString() !== userId.toString()) {
+        throw new UnauthorizedException(ERROR_MESSAGES.AUTHENTICATION.INSUFFICIENT_PERMISSIONS);
+    }
+    
+    await canvas.updateSharedUserPermission(targetUserId, canEdit);
+    
+    return canvas.populate([
+        { path: 'owner', select: 'name email' },
+        { path: 'shared_with.user', select: 'name email' }
+    ]);
 };
 
 const getCanvasStats = async (userId) => {
@@ -178,5 +202,6 @@ module.exports = {
     deleteCanvas,
     shareCanvas,
     unshareCanvas,
+    updateSharedPermission,
     getCanvasStats
 };

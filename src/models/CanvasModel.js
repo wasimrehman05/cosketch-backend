@@ -177,4 +177,19 @@ CanvasSchema.methods.removeSharedUser = function (userId) {
     return this.save();
 };
 
+CanvasSchema.methods.updateSharedUserPermission = function (userId, canEdit) {
+    const sharedUser = this.shared_with.find(
+        share => share.user.toString() === userId.toString()
+    );
+
+    if (!sharedUser) {
+        throw new Error('User not found in shared list');
+    }
+
+    sharedUser.canEdit = canEdit;
+    sharedUser.sharedAt = new Date();
+
+    return this.save();
+};
+
 module.exports = mongoose.model("Canvas", CanvasSchema);

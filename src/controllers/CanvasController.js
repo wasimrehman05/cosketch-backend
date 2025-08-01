@@ -74,6 +74,7 @@ const shareCanvas = async (req, res) => {
         const { canvasId } = req.params;
         const userId = req.user.id;
         const shareData = req.body;
+        
         const canvas = await CanvasService.shareCanvas(canvasId, userId, shareData);
         return ResponseHelper.success(res, 200, SUCCESS_MESSAGES.CANVAS.SHARED, { canvas });
     } catch (error) {
@@ -87,6 +88,18 @@ const unshareCanvas = async (req, res) => {
         const userId = req.user.id;
         const canvas = await CanvasService.unshareCanvas(canvasId, userId, targetUserId);
         return ResponseHelper.success(res, 200, SUCCESS_MESSAGES.CANVAS.UNSHARED, { canvas });
+    } catch (error) {
+        return ResponseHelper.error(res, error.statusCode || 500, error.message, error.errors || undefined);
+    }
+};
+
+const updateSharedPermission = async (req, res) => {
+    try {
+        const { canvasId, targetUserId } = req.params;
+        const { canEdit } = req.body;
+        const userId = req.user.id;
+        const canvas = await CanvasService.updateSharedPermission(canvasId, userId, targetUserId, canEdit);
+        return ResponseHelper.success(res, 200, SUCCESS_MESSAGES.CANVAS.PERMISSION_UPDATED, { canvas });
     } catch (error) {
         return ResponseHelper.error(res, error.statusCode || 500, error.message, error.errors || undefined);
     }
@@ -111,5 +124,6 @@ module.exports = {
     deleteCanvas,
     shareCanvas,
     unshareCanvas,
+    updateSharedPermission,
     getCanvasStats
 };

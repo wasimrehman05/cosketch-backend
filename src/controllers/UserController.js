@@ -56,8 +56,34 @@ const getUserProfile = async (req, res) => {
     }
 };
 
+const checkUserExists = async (req, res) => {
+    try {
+        const { email } = req.body || {};
+        
+        if (!email) {
+            return ResponseHelper.error(res, 400, "Email is required");
+        }
+
+        const user = await UserService.getUserByEmail(email);
+        
+        if (!user) {
+            return ResponseHelper.error(res, 404, "User not found");
+        }
+
+        return ResponseHelper.success(res, 200, "User found", { user });
+    } catch (error) {
+        return ResponseHelper.error(
+            res, 
+            error.statusCode || 500, 
+            error.message, 
+            error.errors || undefined
+        );
+    }
+};
+
 module.exports = { 
     registerUser, 
     loginUser, 
-    getUserProfile 
+    getUserProfile,
+    checkUserExists
 };
