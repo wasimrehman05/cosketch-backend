@@ -1,8 +1,8 @@
 {
-  "name": "whiteboard-backend",
-  "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
+  "name": "cosketch-backend",
+  "version": "2.1.0",
+  "description": "Backend for CoSketch",
+  "license": "MIT",
   "author": "Wasim Rehman",
   "type": "commonjs",
   "main": "index.js",
