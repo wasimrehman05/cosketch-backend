@@ -6,6 +6,71 @@ const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
 const RATE_LIMIT_MAX_REQUESTS = 100;
 const REQUEST_SIZE_LIMIT = '10mb';
 
+// WebSocket Configuration
+const WEBSOCKET = {
+    // Connection settings
+    RECONNECTION_ATTEMPTS: 5,
+    RECONNECTION_DELAY: 1000,
+    CONNECTION_TIMEOUT: 20000,
+    
+    // Event names
+    EVENTS: {
+        // Connection events
+        CONNECT: 'connect',
+        DISCONNECT: 'disconnect',
+        CONNECT_ERROR: 'connect_error',
+        ERROR: 'error',
+        CONNECTION_STATUS: 'connection-status',
+        
+        // Canvas events
+        JOIN_CANVAS: 'join-canvas',
+        CANVAS_JOINED: 'canvas-joined',
+        CANVAS_UPDATE: 'canvas-update',
+        CANVAS_UPDATED: 'canvas-updated',
+        CANVAS_NAME_UPDATE: 'canvas-name-update',
+        CANVAS_NAME_UPDATED: 'canvas-name-updated',
+        
+        // Element events
+        ELEMENT_CREATE: 'element-create',
+        ELEMENT_CREATED: 'element-created',
+        ELEMENT_UPDATE: 'element-update',
+        ELEMENT_UPDATED: 'element-updated',
+        ELEMENT_DELETE: 'element-delete',
+        ELEMENT_DELETED: 'element-deleted',
+        
+        // User events
+        USER_JOINED: 'user-joined',
+        USER_LEFT: 'user-left',
+        ROOM_USERS: 'room-users',
+        
+        // Cursor events
+        CURSOR_UPDATE: 'cursor-update',
+        CURSOR_UPDATED: 'cursor-updated'
+    },
+    
+    // Room prefixes
+    ROOM_PREFIX: 'canvas-',
+    
+    // Error messages
+    ERRORS: {
+        TOKEN_REQUIRED: 'Authentication error: Token required',
+        TOKEN_INVALID: 'Authentication error: Invalid token',
+        TOKEN_STRUCTURE: 'Authentication error: Invalid token structure',
+        USER_NOT_FOUND: 'Authentication error: User not found',
+        CANVAS_ID_REQUIRED: 'Canvas ID is required',
+        ACCESS_DENIED: 'Access denied to this canvas',
+        NOT_IN_ROOM: 'Not in canvas room',
+        CANVAS_NOT_FOUND: 'Canvas not found or no access',
+        NO_EDIT_PERMISSION: 'No edit permission for this canvas',
+        JOIN_FAILED: 'Failed to join canvas',
+        UPDATE_FAILED: 'Failed to update canvas',
+        ELEMENT_CREATE_FAILED: 'Error creating element',
+        ELEMENT_UPDATE_FAILED: 'Error updating element',
+        ELEMENT_DELETE_FAILED: 'Error deleting element',
+        NAME_UPDATE_FAILED: 'Error updating canvas name'
+    }
+};
+
 const HTTP_STATUS = {
     OK: 200,
     CREATED: 201,
@@ -258,6 +323,7 @@ module.exports = {
     RATE_LIMIT_WINDOW_MS,
     RATE_LIMIT_MAX_REQUESTS,
     REQUEST_SIZE_LIMIT,
+    WEBSOCKET,
     HTTP_STATUS,
     HTTP_STATUS_MESSAGES,
     ERROR_MESSAGES,

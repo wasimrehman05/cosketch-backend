@@ -108,14 +108,30 @@ CanvasSchema.statics.findByCanvasId = async function (canvasId, userId = null) {
 CanvasSchema.methods.canUserEdit = function (userId) {
     if (!userId) return false;
 
+    // Handle populated owner field (owner might be an object with _id)
+    let ownerId;
+    if (typeof this.owner === 'object' && this.owner._id) {
+        ownerId = this.owner._id.toString();
+    } else {
+        ownerId = this.owner.toString();
+    }
+    
     // Owner can always edit
-    if (this.owner.toString() === userId.toString()) {
+    if (ownerId === userId.toString()) {
         return true;
     }
 
     // Check if user is shared with edit access
     const sharedUser = this.shared_with.find(
-        share => share.user.toString() === userId.toString() && share.canEdit
+        share => {
+            let shareUserId;
+            if (typeof share.user === 'object' && share.user._id) {
+                shareUserId = share.user._id.toString();
+            } else {
+                shareUserId = share.user.toString();
+            }
+            return shareUserId === userId.toString() && share.canEdit;
+        }
     );
 
     return !!sharedUser;
@@ -127,14 +143,30 @@ CanvasSchema.methods.canUserView = function (userId) {
 
     if (!userId) return false;
 
+    // Handle populated owner field
+    let ownerId;
+    if (typeof this.owner === 'object' && this.owner._id) {
+        ownerId = this.owner._id.toString();
+    } else {
+        ownerId = this.owner.toString();
+    }
+
     // Owner can always view
-    if (this.owner.toString() === userId.toString()) {
+    if (ownerId === userId.toString()) {
         return true;
     }
 
     // Check if user is shared (with or without edit access)
     const sharedUser = this.shared_with.find(
-        share => share.user.toString() === userId.toString()
+        share => {
+            let shareUserId;
+            if (typeof share.user === 'object' && share.user._id) {
+                shareUserId = share.user._id.toString();
+            } else {
+                shareUserId = share.user.toString();
+            }
+            return shareUserId === userId.toString();
+        }
     );
 
     return !!sharedUser;
@@ -143,8 +175,16 @@ CanvasSchema.methods.canUserView = function (userId) {
 CanvasSchema.methods.canUserDelete = function (userId) {
     if (!userId) return false;
 
+    // Handle populated owner field
+    let ownerId;
+    if (typeof this.owner === 'object' && this.owner._id) {
+        ownerId = this.owner._id.toString();
+    } else {
+        ownerId = this.owner.toString();
+    }
+
     // Only owner can delete
-    return this.owner.toString() === userId.toString();
+    return ownerId === userId.toString();
 };
 
 CanvasSchema.methods.addSharedUser = function (userId, canEdit = false) {

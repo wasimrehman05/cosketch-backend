@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
 require("dotenv").config();
 
 const { connectToDatabase } = require("./src/config/db");
@@ -10,20 +12,32 @@ const errorHandler = require("./src/middleware/errorHandler");
 const requestLogger = require("./src/middleware/requestLogger");
 const { REQUEST_SIZE_LIMIT } = require("./src/constants");
 const { generalLimiter } = require("./src/middleware/rateLimiter");
+const WebSocketService = require("./src/services/WebSocketService");
 
 const app = express();
+const server = createServer(app);
 const PORT = process.env.PORT || 3001;
+const HOST = '0.0.0.0';
 
-// CORS configuration
 const corsOptions = {
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: [process.env.FRONTEND_URL],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   optionsSuccessStatus: 200
 };
 
-if (process.env.NODE_ENV === "production") {
+const io = new Server(server, {
+  cors: {
+    origin: [process.env.FRONTEND_URL],
+    credentials: true,
+    methods: ['GET', 'POST']
+  }
+});
+
+const webSocketService = new WebSocketService(io);
+
+if (process.env.NODE_ENV === "production" || process.env.NODE_ENV === "staging") {
     app.use(helmet({
         contentSecurityPolicy: {
             directives: {
@@ -63,10 +77,11 @@ app.use(errorHandler);
 const startServer = async () => {
     try {
         await connectToDatabase();
-        app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`);
+        server.listen(PORT, HOST, () => {
+            console.log(`Server is running on port ${PORT} and host ${HOST}`);
             console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-            console.log(`CORS enabled for: ${corsOptions.origin.join(', ')}`);
+            console.log(`CORS enabled for: ${corsOptions.origin}`);
+            console.log(`WebSocket server initialized`);
         });
     } catch (error) {
         console.error('Failed to start server:', error);

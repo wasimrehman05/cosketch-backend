@@ -24,9 +24,10 @@ const loginUser = async (req, res) => {
         const { email, password } = req.body || {};
         const user = await UserService.login(email, password);
         
+        const jwtSecret = process.env.JWT_SECRET || 'your_super_secret_jwt_key_here_change_this_in_production';
         const token = jwt.sign(
             { id: user._id, email: user.email },
-            process.env.JWT_SECRET,
+            jwtSecret,
             { expiresIn: JWT_EXPIRES_IN }
         );
         
