@@ -1,0 +1,15 @@
+# Simulated request to render project so that the service doesn't go down
+name: Render ping
+
+on:
+  schedule:
+    - cron: '* * * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  curl-website:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run cURL on Website
+        run: curl -I https://cosketch-backend.onrender.com/health
